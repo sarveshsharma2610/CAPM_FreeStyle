@@ -1,0 +1,143 @@
+_schema-version: 3.3.0
+ID: CAPM_FreeStyle
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: CAPM_FreeStyle-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: CAPM_FreeStyle-auth
+  - name: CAPM_FreeStyleHDI_v2
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    readiness-health-check-http-endpoint: /health
+    readiness-health-check-type: http
+  build-parameters:
+    builder: npm
+    ignore:
+    - node_modules/
+- name: CAPM_FreeStyle-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: CAPM_FreeStyleHDI_v2
+  parameters:
+    buildpack: nodejs_buildpack
+- name: CAPM_FreeStyle-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: CAPM_FreeStyle-destination-service
+    parameters:
+      content-target: true
+  - name: CAPM_FreeStyle_html_repo_host
+    parameters:
+      service-key:
+        name: CAPM_FreeStyle_html_repo_host-key
+  - name: CAPM_FreeStyle-auth
+    parameters:
+      service-key:
+        name: CAPM_FreeStyle-auth-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: Capm_FreeStyle_CAPM_FreeStyle_html_repo_host
+          ServiceInstanceName: CAPM_FreeStyle-html5-app-host-service
+          ServiceKeyName: CAPM_FreeStyle_html_repo_host-key
+          sap.cloud.service: Capm_FreeStyle
+        - Authentication: OAuth2UserTokenExchange
+          Name: Capm_FreeStyle_CAPM_FreeStyle_auth
+          ServiceInstanceName: CAPM_FreeStyle-xsuaa-service
+          ServiceKeyName: CAPM_FreeStyle-auth-key
+          sap.cloud.service: Capm_FreeStyle
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
+- name: CAPM_FreeStyle-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: CAPM_FreeStyle_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - comflightsfightsdata.zip
+      name: comflightsfightsdata
+      target-path: resources/
+- name: comflightsfightsdata
+  type: html5
+  path: app/fightsdata
+  requires:
+  - name: CAPM_FreeStyle-auth
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: CAPM_FreeStyle-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: CAPM_FreeStyle-xsuaa-service
+    service-plan: application
+- name: CAPM_FreeStyleHDI_v2
+  type: com.sap.xs.hdi-container
+  parameters:
+    config:
+      schema: CAPM_FreeStyle_schema
+    service: hana
+    service-plan: hdi-shared
+- name: CAPM_FreeStyle-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: Capm_FreeStyle-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: CAPM_FreeStyle-destination-service
+    service-plan: lite
+  requires:
+  - name: srv-api
+- name: CAPM_FreeStyle_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: CAPM_FreeStyle-html5-app-host-service
+    service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production

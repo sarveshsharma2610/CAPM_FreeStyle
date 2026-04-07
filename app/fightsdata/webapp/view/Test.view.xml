@@ -1,0 +1,16 @@
+<mvc:View xmlns:smarttable="sap.ui.comp.smarttable" xmlns:smartfilterbar="sap.ui.comp.smartfilterbar" controllerName="com.flights.fightsdata.controller.Test"
+    xmlns:mvc="sap.ui.core.mvc" xmlns:table='sap.ui.table'
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+    <content>
+    <smartfilterbar:SmartFilterBar id="smartfilterbar" entitySet="FlightsData"></smartfilterbar:SmartFilterBar>
+    <smarttable:SmartTable id="smarttable" smartFilterId="smartfilterbar" persistencyKey="true" entitySet="FlightsData">
+        <table:Table id="UItable" selectionMode="Single" rows="{path: '/FlightsData'}">
+            <table:rowSettingsTemplate>
+                <table:RowSettings id="idRowHgh" highlight="{path: 'status', formatter: '.formatStatusColor'}"/>
+            </table:rowSettingsTemplate>
+        </table:Table>
+    </smarttable:SmartTable>
+    </content>
+    </Page>
+</mvc:View>

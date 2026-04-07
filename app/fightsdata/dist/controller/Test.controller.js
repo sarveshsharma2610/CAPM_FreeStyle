@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/core/mvc/Controller"],e=>{"use strict";return e.extend("com.flights.fightsdata.controller.Test",{onInit(){},formatStatusColor(e){switch(e){case"Departed":return"Success";case"Cancelled":return"Error";case"Delay":return"Warning";case"On Time":return"Success";default:return"None"}}})});
+//# sourceMappingURL=Test.controller.js.map

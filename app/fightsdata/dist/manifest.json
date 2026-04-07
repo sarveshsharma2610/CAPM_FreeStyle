@@ -1,0 +1,143 @@
+{
+	"_version": "1.83.0",
+	"sap.app": {
+		"id": "com.flights.fightsdata",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:basic",
+			"version": "1.22.0",
+			"toolsId": "97716d12-def5-4886-93ce-cef485d1399f"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/odata/v2/catalog/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "2.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"Flights-display": {
+					"semanticObject": "Flights",
+					"action": "display",
+					"title": "{{Flights-display.flpTitle}}",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.146.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "com.flights.fightsdata.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			}
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"controlAggregation": "pages",
+				"controlId": "app",
+				"transition": "slide",
+				"type": "View",
+				"viewType": "XML",
+				"path": "com.flights.fightsdata.view",
+				"async": true,
+				"viewPath": "com.flights.fightsdata.view"
+			},
+			"routes": [
+				{
+					"name": "RouteTest",
+					"pattern": ":?query:",
+					"target": [
+						"TargetTest"
+					]
+				}
+			],
+			"targets": {
+				"TargetTest": {
+					"id": "Test",
+					"name": "Test"
+				}
+			}
+		},
+		"rootView": {
+			"viewName": "com.flights.fightsdata.view.App",
+			"type": "XML",
+			"id": "App",
+			"async": true
+		},
+		"flexBundle": false
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "Capm_FreeStyle"
+	}
+}
